@@ -88,3 +88,6 @@ typings/
 .dynamodb/
 
 screenshots/
+last.txt
+src/defaultMessage.js
+*.png

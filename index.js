@@ -1,13 +1,22 @@
 const Poster = require('./src/poster')
+const { getLatestUser } = require('./src/read-write')
+
+const MINUTE = 60 * 1000
+const latestUser = getLatestUser()
+
+const poster = new Poster(latestUser)
 
 const main = async () => {
-    const poster = new Poster()
+
     await poster.start()
-    await poster.checkPostings()
 
+    setInterval(async () => {
+        console.log(' -----> New posting!')
 
-    console.log(poster.posts)
-    await poster.close()
+        await poster.fetchPosts()
+        await poster.reply()
+
+    }, MINUTE)
 }
 
 main()

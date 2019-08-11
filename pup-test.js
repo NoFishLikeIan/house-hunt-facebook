@@ -1,5 +1,6 @@
 const puppeteer = require('puppeteer')
 
+
 const MEMORY_SETTINGS = ['--unlimited-storage', '--full-memory-crash-report', '--disable-dev-shm-usage']
 const SANDBOX = ['--no-sandbox', '--disable-setuid-sandbox', '--disable-features=VizDisplayCompositor']
 const UBUNTU = ['--disable-gpu', '--disable-software-rasterizer']
