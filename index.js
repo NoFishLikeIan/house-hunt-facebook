@@ -1,29 +1,13 @@
-const puppeteer = require('puppeteer')
-const login = require('./src/login')
-
-const MEMORY_SETTINGS = ['--unlimited-storage', '--full-memory-crash-report', '--disable-dev-shm-usage']
-const SANDBOX = ['--no-sandbox', '--disable-setuid-sandbox', '--disable-features=VizDisplayCompositor']
-const UBUNTU = ['--disable-gpu', '--disable-software-rasterizer']
-
-const isLinux = process.platform === 'linux'
-
-const linuxArgs = {
-    args: [...MEMORY_SETTINGS, ...SANDBOX, ...UBUNTU],
-    executablePath: '/usr/bin/chromium-browser',
-}
-
-const browserLunch = isLinux ? linuxArgs : {}
+const Poster = require('./src/poster')
 
 const main = async () => {
-    const browser = await puppeteer.launch(browserLunch)
-    const page = await browser.newPage()
+    const poster = new Poster()
+    await poster.start()
+    await poster.checkPostings()
 
 
-    await login(page)
-
-    await page.screenshot({
-        path: 'test.png'
-    })
+    console.log(poster.posts)
+    await poster.close()
 }
 
 main()
