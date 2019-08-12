@@ -9,7 +9,8 @@ const poster = new Poster(latestUser)
 
 const main = (async () => {
 
-    const run = async () => {
+    const run = (async () => {
+        start = Date.now()
         await poster.start()
 
         try {
@@ -19,7 +20,9 @@ const main = (async () => {
             await poster.reply()
         } catch (error) { console.log('Main error', error, '\n Retrying') }
         await poster.close()
-    }
 
-    run()
-})()
+        console.log('--- Job done, it took ', (Date.now() - start) / 1000, ' seconds.')
+    })()
+})
+
+setInterval(main, MINUTE * 3)

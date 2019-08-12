@@ -130,41 +130,38 @@ class Poster {
     }
 
     async reply() {
-
         const [user, price] = this.latest
         const canAfford = (!price || price < 900)
-        if (user !== this.lastMessaged && canAfford) {
+
+        if (user && user !== this.lastMessaged && canAfford) {
 
             await this.clickLatest()
 
             const message = defaultMessage(user)
             await sleep(3000)
 
-            await this.page.screenshot({
-                path: 'screenshots/clicking.png'
-            })
-
             await this.page.waitForSelector(selectors.textarea, { visible: true })
 
             await this.page.click(selectors.textarea, { clickCount: 3 })
             console.log('Clicking!')
 
-            await this.page.screenshot({
-                path: 'screenshots/typing.png'
-            })
-
             await this.page.type(selectors.textarea, message, { delay: 150 })
             console.log('Typing!')
 
             await this.page.screenshot({
-                path: `screenshots/filled_${user.split(' ')[0]}.png`
+                path: `screenshots/filled/${user.split(' ')[0]}.png`
             })
 
             await sleep(1000)
             await this.page.click(selectors.send, { delay: 150 })
 
-            console.log(`Done with user ${user}...`)
 
+            await this.page.screenshot({
+                path: `screenshots/sent/${user.split(' ')[0]}.png`
+            })
+
+            console.log(`Done with user ${user}...`)
+            await sleep(2000)
             this.updateLatestUser(user)
         } else {
             console.log('Known user or too high price', user, price)
