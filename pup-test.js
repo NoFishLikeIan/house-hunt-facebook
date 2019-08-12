@@ -38,7 +38,7 @@ const main = async () => {
 
         console.log('Taking picture!')
         await page.screenshot({
-            path: `${url.split('//')[1]}.png`
+            path: `screenshots/${url.split('//')[1]}.png`
         })
 
         console.log(`Done with ${url}`)

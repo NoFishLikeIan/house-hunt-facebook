@@ -4,7 +4,7 @@ const { zip } = require('lodash')
 const credentials = require('./credentials')
 const defaultMessage = require('./defaultMessage')
 const { writeLatestUser } = require('./read-write')
-const { classnames } = require('./constants')
+const { classnames, selectors } = require('./constants')
 const { sleep } = require('./utils')
 
 const MEMORY_SETTINGS = ['--unlimited-storage', '--full-memory-crash-report', '--disable-dev-shm-usage']
@@ -55,7 +55,7 @@ class Poster {
     }
 
     get latest() {
-        return this.posts.length && this.posts[0]
+        return this.posts.length > 0 ? this.posts[0] : []
     }
 
     async login() {
@@ -135,43 +135,37 @@ class Poster {
         const canAfford = (!price || price < 900)
         if (user !== this.lastMessaged && canAfford) {
 
-            this.updateLatestUser(user)
             await this.clickLatest()
 
             const message = defaultMessage(user)
-
-            const result = await this.page.evaluate(({ user, message, classnames }) => {
-                const currentUser = document.getElementsByClassName('uiTokenText')[0].innerText
-                if (currentUser !== user) {
-                    console.warn('Different user from select: ', user, ' and ', currentUser)
-                    return -1
-                }
-
-                const textArea = [...document.getElementsByTagName('textarea')].filter(el => el.defaultValue.includes('Hi,'))[0]
-                textArea.value = message
-
-                const sendButton = document.getElementsByClassName(classnames.send)[0]
-
-                if (!sendButton) {
-                    console.warn('No send button!')
-                    return -1
-                } else {
-                    // sendButton.click()
-
-                    const closeButton = document.getElementsByClassName(classnames.close)[0]
-                    if (closeButton) closeButton.click()
-
-                    console.log('Message sent to ', user)
-                    return 1
-                }
-            }, { user, message, classnames })
-
-            if (result < 0) console.warn('Error in message reply!')
-            await sleep(5000)
+            await sleep(3000)
 
             await this.page.screenshot({
-                path: 'screenshots/filled.png'
+                path: 'screenshots/clicking.png'
             })
+
+            await this.page.waitForSelector(selectors.textarea, { visible: true })
+
+            await this.page.click(selectors.textarea, { clickCount: 3 })
+            console.log('Clicking!')
+
+            await this.page.screenshot({
+                path: 'screenshots/typing.png'
+            })
+
+            await this.page.type(selectors.textarea, message, { delay: 150 })
+            console.log('Typing!')
+
+            await this.page.screenshot({
+                path: `screenshots/filled_${user.split(' ')[0]}.png`
+            })
+
+            await sleep(1000)
+            await this.page.click(selectors.send, { delay: 150 })
+
+            console.log(`Done with user ${user}...`)
+
+            this.updateLatestUser(user)
         } else {
             console.log('Known user or too high price', user, price)
         }
